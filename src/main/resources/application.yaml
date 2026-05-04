@@ -1,0 +1,4 @@
+logging:
+  level:
+    de.workshops.bookshelf: DEBUG
+    org.springframework: ERROR
