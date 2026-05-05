@@ -1,37 +1,58 @@
 package de.workshops.bookshelf.books;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
-import org.springframework.core.io.ResourceLoader;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/books")
+@Validated
 public class BookRestController {
-    private final ObjectMapper mapper;
-    private final ResourceLoader resourceLoader;
+    private final BookService bookService;
 
-    private List<Book> books;
-
-    public BookRestController(ObjectMapper mapper, ResourceLoader resourceLoader) {
-        this.mapper = mapper;
-        this.resourceLoader = resourceLoader;
-    }
-
-    @PostConstruct
-    public void init() throws IOException {
-        final var resource = resourceLoader.getResource("classpath:books.json");
-        this.books = mapper.readValue(resource.getInputStream(), new TypeReference<>() {});
+    public BookRestController(BookService bookService) {
+        this.bookService = bookService;
     }
 
     @GetMapping
     List<Book> getAllBooks() {
-        return books;
+        return bookService.getAllBooks();
+    }
+
+    @GetMapping("/{isbn}")
+    Book getBookByIsbn(@PathVariable(name = "isbn") @Size(min = 10, max = 14) String anIsbn) {
+        return bookService.getBookByIsbn(anIsbn);
+    }
+
+    @GetMapping(params = "author")
+    ResponseEntity<List<Book>> getBooksByAuthor(@RequestParam String author) {
+        var result = bookService.getBooksByAuthor(author);
+
+        if (result.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @PostMapping("/search")
+    List<Book> searchBooks(@RequestBody @Valid BookSearchRequest searchRequest) {
+        return bookService.searchBooks(searchRequest);
+    }
+
+    @ExceptionHandler(BookException.class)
+    ResponseEntity<String> handleBookException(BookException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }

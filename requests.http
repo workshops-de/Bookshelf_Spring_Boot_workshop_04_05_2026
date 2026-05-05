@@ -1,2 +1,27 @@
 ###
 GET http://localhost:8080/books
+
+###
+@tooShort = 978-0201
+GET http://localhost:8080/books/{{tooShort}}
+
+###
+@validIsbn = 978-0201633610
+GET http://localhost:8080/books/{{validIsbn}}
+
+###
+@wrongIsbn = 978-0201633611
+GET http://localhost:8080/books/{{wrongIsbn}}
+
+###
+GET http://localhost:8080/books?author=Rob
+
+###
+POST http://localhost:8080/books/search
+Content-Type: application/json
+
+{
+  "title": "Design",
+  "author": "bert",
+  "blabla": "something"
+}
