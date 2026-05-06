@@ -1,4 +1,9 @@
+debug: true
+
 logging:
   level:
     de.workshops.bookshelf: DEBUG
-    org.springframework: ERROR
+    org.springframework: INFO
+
+app:
+  name: Bookshelf

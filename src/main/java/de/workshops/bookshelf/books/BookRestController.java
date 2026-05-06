@@ -2,6 +2,7 @@ package de.workshops.bookshelf.books;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -21,6 +22,9 @@ import java.util.List;
 @Validated
 public class BookRestController {
     private final BookService bookService;
+
+    @Value("${app.name:Bücherregal}")
+    private String applicationName;
 
     public BookRestController(BookService bookService) {
         this.bookService = bookService;
@@ -49,6 +53,11 @@ public class BookRestController {
     @PostMapping("/search")
     List<Book> searchBooks(@RequestBody @Valid BookSearchRequest searchRequest) {
         return bookService.searchBooks(searchRequest);
+    }
+
+    @PostMapping
+    Book addBook(@RequestBody @Valid Book book) {
+        return bookService.addBook(book);
     }
 
     @ExceptionHandler(BookException.class)

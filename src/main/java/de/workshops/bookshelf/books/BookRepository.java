@@ -3,6 +3,7 @@ package de.workshops.bookshelf.books;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import jakarta.validation.Valid;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Repository;
 
@@ -29,5 +30,10 @@ public class BookRepository {
 
     List<Book> findAllBooks() {
         return books;
+    }
+
+    public Book save(@Valid Book book) {
+        books.add(book);
+        return book;
     }
 }

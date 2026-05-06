@@ -1,5 +1,6 @@
 package de.workshops.bookshelf.books;
 
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,4 +37,7 @@ public class BookService {
             .toList();
     }
 
+    public Book addBook(@Valid Book book) {
+        return bookRepository.save(book);
+    }
 }

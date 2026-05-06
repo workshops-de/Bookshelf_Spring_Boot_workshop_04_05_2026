@@ -4,19 +4,23 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+//@SpringBootTest
+//@AutoConfigureMockMvc
+@WebMvcTest(BookRestController.class)
+@Import({BookService.class, BookRepository.class})
 class BookRestControllerMockMvcTest {
     @Autowired
     private MockMvc mockMvc;
@@ -61,5 +65,34 @@ class BookRestControllerMockMvcTest {
 
         assertThat(book).isNotNull();
         assertThat(book.getIsbn()).isEqualTo("978-0201633610");
+    }
+
+    @Test
+    void createBook() throws Exception {
+        String isbn = "1111111111";
+        String title = "My First Book";
+        String author = "Birgit Kratz";
+        String description = "A Must Read Book";
+
+        var mvcResult = mockMvc.perform(post("/books")
+                .content("""
+                                {
+                                    "isbn": "%s",
+                                    "title": "%s",
+                                    "author": "%s",
+                                    "description": "%s"
+                                }""".formatted(isbn, title, author, description))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        var payload = mvcResult.getResponse().getContentAsString();
+        Book book = objectMapper.readValue(payload, Book.class);
+
+        assertThat(book).isNotNull();
+        assertThat(book.getIsbn()).isEqualTo(isbn);
+        assertThat(book.getTitle()).isEqualTo(title);
+        assertThat(book.getAuthor()).isEqualTo(author);
+        assertThat(book.getDescription()).isEqualTo(description);
     }
 }
