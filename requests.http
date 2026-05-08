@@ -1,5 +1,6 @@
 ###
 GET http://localhost:8080/books
+Authorization: Basic user c234d7a3-7eed-4ad4-9bf7-0feb8326b59c
 
 ###
 @tooShort = 978-0201

@@ -10,7 +10,7 @@ app:
 
 springdoc:
   api-docs:
-    enabled: false
+    enabled: true
 
 swagger:
   title: Bookshelf API
@@ -28,12 +28,21 @@ spring:
     username: birgit
     password: geheim
   jpa:
+    show-sql: true
     open-in-view: false
-    generate-ddl: true
-    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: validate
+#    generate-ddl: true
+#    defer-datasource-initialization: true
   h2:
     console:
       enabled: true
   sql:
     init:
       mode: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

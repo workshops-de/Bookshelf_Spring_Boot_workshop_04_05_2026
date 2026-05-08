@@ -4,14 +4,17 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -19,8 +22,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NON_TEST)
 //@WebMvcTest(controllers={BookRestController.class})
 //@Import({BookService.class, BookJdbcRepository.class, TestConfig.class, JdbcTemplate.class})
+@WithMockUser
 class BookRestControllerMockMvcTest {
     @Autowired
     private MockMvc mockMvc;
@@ -68,13 +73,22 @@ class BookRestControllerMockMvcTest {
     }
 
     @Test
+    void createBook_forbidden() throws Exception {
+        mockMvc.perform(post("/books").with(csrf())
+                .content("{}")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     void createBook() throws Exception {
         String isbn = "1111111111";
         String title = "My First Book";
         String author = "Birgit Kratz";
         String description = "A Must Read Book";
 
-        var mvcResult = mockMvc.perform(post("/books")
+        var mvcResult = mockMvc.perform(post("/books").with(csrf())
                 .content("""
                                 {
                                     "isbn": "%s",
