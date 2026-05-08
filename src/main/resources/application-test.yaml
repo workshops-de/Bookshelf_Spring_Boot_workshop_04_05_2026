@@ -1,2 +1,9 @@
 server:
   port: 8181
+
+springdoc:
+  api-docs:
+    enabled: true
+
+swagger:
+  capacity: 1000

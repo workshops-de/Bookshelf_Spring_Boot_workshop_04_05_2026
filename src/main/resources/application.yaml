@@ -1,4 +1,4 @@
-debug: true
+#debug: true
 
 logging:
   level:
@@ -7,3 +7,33 @@ logging:
 
 app:
   name: Bookshelf
+
+springdoc:
+  api-docs:
+    enabled: false
+
+swagger:
+  title: Bookshelf API
+  description: Bookshelf API
+  version: v1.0.0
+  capacity: 2000
+  license:
+    name: 'MIT License'
+    url: 'https://opensource.org/licenses/MIT'
+  blabla: lksjdfglkdsjg
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: birgit
+    password: geheim
+  jpa:
+    open-in-view: false
+    generate-ddl: true
+    defer-datasource-initialization: true
+  h2:
+    console:
+      enabled: true
+  sql:
+    init:
+      mode: always
